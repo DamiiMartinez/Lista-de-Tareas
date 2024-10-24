@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Lista de Tareas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <button class="btn" id="toggleForm">
+            <i class="fas fa-plus"></i> <!-- Ícono de más -->
+        </button>
+
+        <form id="Lista">
+            <label>
+                <p>
+                    Tarea: 
+                    <input type="text" name="hacer" id="hacer" required>
+                </p>                
+            </label>
+            <label>
+                <p>
+                    Lo que Necesito: 
+                    <textarea name="compras" id="compras" cols="30" rows="10" required></textarea>
+                </p>                
+            </label>
+            <button type="submit" class="btn">Enviar</button>
+        </form>
+    </header>
+
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tareas</th>
+                    <th>Lo Que Necesito</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="taskTableBody">
+                <!-- Aquí irán las filas de la tabla -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        const toggleFormButton = document.getElementById('toggleForm');
+        const form = document.getElementById('Lista');
+        const taskTableBody = document.getElementById('taskTableBody');
+    
+        // Mostrar u ocultar el formulario
+        toggleFormButton.addEventListener('click', () => {
+            form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+        });
+    
+        // Manejar el evento de envío del formulario
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
+    
+            const hacer = document.getElementById('hacer').value;
+            const compras = document.getElementById('compras').value;
+            const tarea = { Hacer: hacer, Compras: compras };
+    
+            try {
+                // Enviar los datos al servidor para guardarlos en la base de datos
+                const response = await fetch('http://localhost:3000/listas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tarea)
+                });
+    
+                // Espera la respuesta del servidor
+                const nuevaLista = await response.json();
+                addTaskToTable(nuevaLista.Hacer, nuevaLista.Compras); // Agregar a la tabla en el frontend
+    
+                // Limpiar el formulario y ocultarlo después de enviar
+                form.reset();
+                form.style.display = 'none';
+            } catch (error) {
+                console.error('Error al hacer la solicitud:', error);
+            }
+        });
+    
+        // Función para agregar una nueva tarea a la tabla
+        function addTaskToTable(hacer, compras) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${hacer}</td>
+                <td>${compras}</td>
+                <td><button class="btn delete-btn">Eliminar</button></td>`;
+            
+            // Agregar funcionalidad al botón de eliminar
+            const deleteButton = newRow.querySelector('.delete-btn');
+            deleteButton.addEventListener('click', async () => {
+                try {
+                    // Hacer la solicitud para eliminar el elemento de la base de datos
+                    const response = await fetch(`http://localhost:3000/listas/${hacer}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        newRow.remove(); // Eliminar la fila del frontend
+                    } else {
+                        console.error('Error al eliminar la tarea');
+                    }
+                } catch (error) {
+                    console.error('Error en la solicitud de eliminación:', error);
+                }
+            });
+    
+            taskTableBody.appendChild(newRow); // Agregar la nueva fila a la tabla
+        }
+    
+        // Función para cargar los datos de la base de datos
+        async function loadTasksFromDatabase() {
+            try {
+                // Solicitar al servidor los datos de la base de datos
+                const response = await fetch('http://localhost:3000/listas');
+                const tasks = await response.json();
+    
+                // Agregar cada tarea a la tabla
+                tasks.forEach(task => {
+                    addTaskToTable(task.Hacer, task.Compras);
+                });
+            } catch (error) {
+                console.error('Error al cargar los datos desde la base de datos:', error);
+            }
+        }
+    
+        // Cargar las tareas desde la base de datos cuando se carga la página
+        window.onload = loadTasksFromDatabase;
+    </script>
+
+</body>
+</html>

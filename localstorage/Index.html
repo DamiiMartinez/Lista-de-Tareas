@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Lista de Tareas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <button class="btn" id="toggleForm">
+            <i class="fas fa-plus"></i> <!-- Ícono de más -->
+        </button>
+
+        <form id="Lista">
+            <label>
+                <p>
+                    Tarea: 
+                    <input type="text" name="hacer" id="hacer" required>
+                </p>                
+            </label>
+            <label>
+                <p>
+                    Lo que Necesito: 
+                    <textarea name="compras" id="compras" cols="30" rows="10" required></textarea>
+                </p>                
+            </label>
+            <button type="submit" class="btn">Enviar</button>
+        </form>
+    </header>
+
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tareas</th>
+                    <th>Lo Que Necesito</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="taskTableBody">
+                <!-- Aquí irán las filas de la tabla -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        const toggleFormButton = document.getElementById('toggleForm');
+        const form = document.getElementById('Lista');
+        const taskTableBody = document.getElementById('taskTableBody');
+
+        toggleFormButton.addEventListener('click', () => {
+            form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const hacer = document.getElementById('hacer').value;
+            const compras = document.getElementById('compras').value;
+            const tarea = { Hacer: hacer, Compras: compras };
+
+            saveTaskToLocalStorage(tarea);
+
+            addTaskToTable(hacer, compras);
+        });
+
+        function addTaskToTable(hacer, compras) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${hacer}</td>
+                <td>${compras}</td>
+                <td><button class="btn delete-btn">Eliminar</button></td>`;
+            
+            const deleteButton = newRow.querySelector('.delete-btn');
+            deleteButton.addEventListener('click', () => {
+                newRow.remove();
+                removeTaskFromLocalStorage(hacer);
+            });
+
+            taskTableBody.appendChild(newRow);
+        }
+
+        function saveTaskToLocalStorage(task) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function removeTaskFromLocalStorage(hacer) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks = tasks.filter(task => task.Hacer !== hacer);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function loadTasksFromLocalStorage() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(task => {
+                addTaskToTable(task.Hacer, task.Compras);
+            });
+        }
+
+        window.onload = loadTasksFromLocalStorage;
+    </script>
+
+</body>
+</html>

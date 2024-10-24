@@ -1,0 +1,69 @@
+*{
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 20px;
+    color: white;
+    background-color: #4CAF50; /* Color de fondo verde */
+    border: none;
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambiar cursor al pasar el ratón */
+    transition: background-color 0.3s; /* Efecto de transición */
+}
+
+.btn:hover {
+    background-color: #45a049; /* Color más oscuro al pasar el ratón */
+}
+
+/* Estilos para el formulario */
+form {
+    display: none; /* Inicialmente oculto */
+
+    margin: 0 auto;
+    padding: 20px;
+
+    width: 40%;
+    height: 300px;
+
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9; /* Color de fondo del formulario */
+}
+
+main{
+    margin: 10px;
+}
+
+/* Tabla */
+table {
+    margin: 0 auto;
+
+    width: 80%; /* Fija el ancho del contenedor */
+    height: 500px; /* Fija la altura del contenedor */
+    overflow-x: auto; /* Scroll horizontal si la tabla es muy ancha */
+
+    background-color: #d8cdcd;
+    border-radius: 10px;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background-color: #45a049;
+  color: #fff;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Aquí aplicamos white-space para respetar los saltos de línea y espacios */
+td {
+    white-space: pre-wrap;
+}
